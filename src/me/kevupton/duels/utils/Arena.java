@@ -5,9 +5,14 @@
  */
 package me.kevupton.duels.utils;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
+import me.kevupton.duels.exceptions.DatabaseException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -31,8 +36,6 @@ public class Arena {
     private Location p1_prev_loc;
     private Location p2_prev_loc;
     
-    private final String META_NAME = "duels_in_arena";
-    
     private Arena(String name, Location spawn1, Location spawn2) throws ArenaException {
         if (name == "") {
             throw new ArenaException("Invalid name");
@@ -44,6 +47,11 @@ public class Arena {
         this.spawn1 = spawn1;
         this.spawn2 = spawn2;
         this.duels = Duels.getInstance();
+    }
+    
+    public static void closeAllDuels() {
+        ArrayList<Arena> unavailable = getUnavailableArenas();
+        Duels.logInfo("Not yet supported");
     }
     
     public String getName() {
@@ -76,14 +84,48 @@ public class Arena {
         is_available = false;
     }
     
-    public static  void registerNew(String name, Location spawn1, Location spawn2) throws ArenaException {
-        arenas.add(new Arena(name, spawn1, spawn2));
+    public static  void registerNew(String name, Location spawn1, Location spawn2) throws ArenaException, DatabaseException {
+        Arena a = new Arena(name, spawn1, spawn2);
+        Duels.theDatabase().registerArena(name, spawn1, spawn2);
+        arenas.add(a);
     }
     
     public static void initialise() {
-        /*
-        Get all the arenas and add them to the arenas array
-        */
+        ResultSet rs = Duels.theDatabase().getAllArenas();
+        try {
+            while (rs.next()) {
+                Arena a = parseResultSet(rs);
+                if (a != null) {
+                    arenas.add(a);
+                }
+            }
+        } catch (SQLException ex) {
+            Duels.getInstance().log(ex.toString());
+        }
+    }
+    
+    private static Arena parseResultSet(ResultSet rs) {
+        try {
+            Location spawn1 = new Location(
+                    Duels.getInstance().getServer().getWorld(rs.getString("spawn1_world")), 
+                    rs.getInt("spawn1_x"),
+                    rs.getInt("spawn1_y"),
+                    rs.getInt("spawn1_z")
+            );
+            Location spawn2 = new Location(
+                    Duels.getInstance().getServer().getWorld(rs.getString("spawn2_world")), 
+                    rs.getInt("spawn2_x"),
+                    rs.getInt("spawn2_y"),
+                    rs.getInt("spawn2_z")
+            );
+            String name = rs.getString("name");
+            return new Arena(name, spawn1, spawn2);
+        } catch (SQLException ex) {
+            Duels.logInfo(ex.toString());
+        } catch (ArenaException ex) {
+            Duels.logInfo("Invalid data supplied from database.");
+        }
+        return null;
     }
     
     public static Arena getPlayerArena(Player player) throws ArenaException {
@@ -109,13 +151,28 @@ public class Arena {
         this.p2_prev_loc = p.getLocation();
     }
     
-    public static Arena getRandomAvailable() throws ArenaException {
+    public static ArrayList<Arena> getAvailableArenas() {
         ArrayList<Arena> available = new ArrayList<Arena>();
         for (Arena arena: arenas) {
             if (arena.isAvailable()) {
                 available.add(arena);
             }
         }
+        return available;
+    }
+    
+    public static ArrayList<Arena> getUnavailableArenas() {
+        ArrayList<Arena> unavailable = new ArrayList<Arena>();
+        for (Arena arena: arenas) {
+            if (!arena.isAvailable()) {
+                unavailable.add(arena);
+            }
+        }
+        return unavailable;
+    }
+    
+    public static Arena getRandomAvailable() throws ArenaException {
+        ArrayList<Arena> available = getAvailableArenas();
         if (available.size() >  0) {
             int key = (int) Math.round(Math.random() * (available.size() - 1));
             return available.get(key);
@@ -151,10 +208,10 @@ public class Arena {
 
     public void teleportPlayers() {
         player2.teleport(spawn2);
-        player2.setMetadata(META_NAME, new FixedMetadataValue(duels, true));
+        player2.setMetadata(DuelsMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
         
         player1.teleport(spawn1);
-        player1.setMetadata(META_NAME, new FixedMetadataValue(duels, true));
+        player1.setMetadata(DuelsMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
     }
 
     public void sendPleaseWaitMessage() {
