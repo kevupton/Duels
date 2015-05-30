@@ -5,7 +5,7 @@
  */
 package me.kevupton.duels.events;
 
-import me.kevupton.duels.utils.DuelsMetaData;
+import me.kevupton.duels.utils.DuelMetaData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +19,7 @@ public class PlayerCommandEvent implements Listener {
     @EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
-        if (DuelsMetaData.IN_ARENA.isOn(player)) {
+        if (DuelMetaData.IN_ARENA.isOn(player)) {
             event.setCancelled(true);
         }
     }

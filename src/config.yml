@@ -1,0 +1,12 @@
+Messages:
+  Admin:
+    ArenaNameExists: 'This name is already taken'
+    NotEdittingArena: 'Not currently editting any arenas'
+    NotFinishedEditting: 'Please finish setting up all spawn points before saving'
+  Player:
+    SendToSelf: 'Cannot send a duel request to yourself.' 
+    RequestExists: 'A duel request between you two already exists.'
+    NoAvailableArenas: 'Sorry there are no arenas currently available.'
+    RequestNotExists: 'No request exists between you and that player.'
+    InvalidCommand: 'Invalid Command'
+    

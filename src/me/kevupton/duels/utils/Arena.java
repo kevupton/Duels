@@ -90,6 +90,7 @@ public class Arena {
     
     public static void initialise() {
         ResultSet rs = Duels.theDatabase().getAllArenas();
+        if (rs == null) return;
         try {
             while (rs.next()) {
                 Arena a = parseResultSet(rs);
@@ -206,10 +207,10 @@ public class Arena {
 
     public void teleportPlayers() {
         player2.teleport(spawn2);
-        player2.setMetadata(DuelsMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
+        player2.setMetadata(DuelMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
         
         player1.teleport(spawn1);
-        player1.setMetadata(DuelsMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
+        player1.setMetadata(DuelMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
     }
 
     public void sendPleaseWaitMessage() {

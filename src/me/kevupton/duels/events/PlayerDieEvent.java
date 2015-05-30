@@ -8,7 +8,7 @@ package me.kevupton.duels.events;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.utils.Arena;
-import me.kevupton.duels.utils.DuelsMetaData;
+import me.kevupton.duels.utils.DuelMetaData;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,7 +24,7 @@ public class PlayerDieEvent implements Listener {
     public void onPlayerDie(EntityDeathEvent event) {
         if (event.getEntityType().equals(EntityType.PLAYER)) {
             Player player = (Player) event.getEntity();
-            if (DuelsMetaData.IN_ARENA.isOn(player)) {
+            if (DuelMetaData.IN_ARENA.isOn(player)) {
                 try {
                     Arena arena = Arena.getPlayerArena(player);
                     arena.setLoser(player);

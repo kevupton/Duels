@@ -9,8 +9,10 @@ import me.kevupton.duels.exceptions.DuelCommandException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import me.kevupton.duels.utils.Arena;
 import me.kevupton.duels.utils.Database;
+import me.kevupton.duels.utils.DuelMessage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -42,7 +44,7 @@ public class Duels extends JavaPlugin {
         try {
             return command.execute();
         } catch (DuelCommandException ex) {
-            log(ex.toString());
+            DuelMessage.INVALID_COMMAND.sendTo((Player) sender);
         }
         return false;
     }
