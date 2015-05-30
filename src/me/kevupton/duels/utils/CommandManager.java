@@ -34,11 +34,13 @@ public class CommandManager {
         DUEL_ADMIN ("dueladmin"),
         ACCEPT_DUEL ("accept"),
         CREATE_ARENA ("create"),
+        REMOVE_ARENA ("remove"),
         SET_SPAWN_1 ("setspawn1"),
         SET_SPAWN_2 ("setspawn2"),
         SAVE        ("save"),
         UPDATE_ARENA ("update"),
-        LEAVE ("leave");
+        LEAVE ("leave"),
+        CANCEL ("cancel");
         
         private String command;
         
@@ -132,6 +134,27 @@ public class CommandManager {
                             if (args.length == 2) {
                                 String name = args[1];
                                 DuelMetaData.updateArenaName(player, name, sub);
+                                if (sub.equals(DuelCommand.UPDATE_ARENA)) {
+                                    DuelMessage.STARTED_UPDATING_ARENA.sendTo(player, name);
+                                } else {
+                                    DuelMessage.STARTED_CREATING_ARENA.sendTo(player);
+                                }
+                            } else {
+                                throw new DuelCommandException("Invalid Command");
+                            }
+                            break;
+                        case CANCEL:
+                            DuelMetaData.removeEdittingArena(player);
+                            DuelMessage.CANCEL_ARENA_EDIT.sendTo(player);
+                            break;
+                        case REMOVE_ARENA:
+                            if (args.length == 2) {
+                                try {
+                                    Arena.remove(args[1]);
+                                    DuelMessage.REMOVE_ARENA_SUCCESS.sendTo(player);
+                                } catch (ArenaException ex) {
+                                    DuelMessage.ARENA_NOT_FOUND.sendTo(player);
+                                }
                             } else {
                                 throw new DuelCommandException("Invalid Command");
                             }
@@ -139,6 +162,7 @@ public class CommandManager {
                         case SET_SPAWN_1:
                             if (DuelMetaData.isEdittingArena(player)) {
                                 DuelMetaData.updateArenaSpawn1(player, player.getLocation());
+                                DuelMessage.SPAWN_1_SET.sendTo(player);
                             } else {
                                 DuelMessage.NOT_EDITTING_ARENA.sendTo(player);
                             }
@@ -147,28 +171,31 @@ public class CommandManager {
                         case SET_SPAWN_2:
                             if (DuelMetaData.isEdittingArena(player)) {
                                 DuelMetaData.updateArenaSpawn2(player, player.getLocation());
+                                DuelMessage.SPAWN_2_SET.sendTo(player);
                             } else {
                                 DuelMessage.NOT_EDITTING_ARENA.sendTo(player);
                             }
                             break;
                         
                         case SAVE:
-                            if (DuelMetaData.isCompletedEdittingArena(player)) {
-                                Object[] data = DuelMetaData.getEdittingArenaData(player);
-                                try {
-                                    DuelCommand sub_cmd = (DuelCommand) data[3];
-                                    if (sub_cmd.equals(DuelCommand.CREATE_ARENA)) {
-                                        Duels.theDatabase().registerArena((String) data[0], (Location) data[1], (Location) data[2]);
+                            Object[] data = DuelMetaData.getEdittingArenaData(player);
+                            DuelCommand sub_cmd = (DuelCommand) data[3];
+                            if (sub_cmd.equals(DuelCommand.CREATE_ARENA)) {
+                                if (DuelMetaData.isCompletedEdittingArena(player)) {
+                                    try {
+                                        Arena.registerNew((String) data[0], (Location) data[1], (Location) data[2]);
                                         DuelMessage.ARENA_CREATE_SUCCESS.sendTo(player);
-                                    } else {
-                                        
+                                        DuelMetaData.removeEdittingArena(player);
+                                    } catch (DatabaseException | ArenaException ex) {
+                                        DuelMessage.ARENA_NAME_EXISTS.sendTo(player);
                                     }
-                                    DuelMetaData.removeEdittingArena(player);
-                                } catch (DatabaseException ex) {
-                                    DuelMessage.ARENA_NAME_EXISTS.sendTo(player);
+                                } else {
+                                    DuelMessage.PLEASE_COMPLETE_ARENA.sendTo(player);
                                 }
                             } else {
-                                
+                                Arena.updateArena(data);
+                                DuelMessage.ARENA_UPDATE_SUCCESS.sendTo(player);
+                                DuelMetaData.removeEdittingArena(player);
                             }
                             break;
                     }

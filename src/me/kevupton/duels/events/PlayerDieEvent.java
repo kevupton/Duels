@@ -26,6 +26,7 @@ public class PlayerDieEvent implements Listener {
             Player player = (Player) event.getEntity();
             if (DuelMetaData.IN_ARENA.isOn(player)) {
                 DuelMetaData.remove(player, DuelMetaData.IN_ARENA);
+                DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
                 try {
                     Arena arena = Arena.getPlayerArena(player);
                     arena.setLoser(player);

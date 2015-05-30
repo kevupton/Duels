@@ -11,6 +11,7 @@ import me.kevupton.duels.utils.Arena;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 /**
  *
@@ -30,29 +31,29 @@ public class StartDuel implements Runnable {
         long start_time = System.currentTimeMillis();
         Player p1 = arena.getPlayer1();
         Player p2 = arena.getPlayer2();
-        Location loc_check_p1 = p1.getLocation();
-        Location loc_check_p2 = p2.getLocation();
+        Vector loc_check_p1 = p1.getLocation().toVector();
+        Vector loc_check_p2 = p2.getLocation().toVector();
         boolean entered_arena = false;
-        boolean wait_message_sent = false;
+        boolean msg1 = false;
+        boolean msg2 = false;
+        boolean msg3 = false;
         
         long time = 0;
         while (true) {
             time = getCurrentTimeInSeconds(start_time);
             if (!entered_arena) {
-                if (!wait_message_sent) {
-                    wait_message_sent = true;
-                    arena.sendPleaseWaitMessage();
-                }
                 if (time >= LOAD_TIME) {
                     arena.teleportPlayers();
-                    start_time = time;
+                    start_time = System.currentTimeMillis();
                     entered_arena = true;
                 } else {
-                    if (!p1.getLocation().equals(loc_check_p1)) {
+                    if (!p1.getLocation().toVector().equals(loc_check_p1)) {
                         arena.sendCancelMessage(p1);
+                        arena.reset();
                         break;
-                    } else if (!p2.getLocation().equals(loc_check_p2)) {
+                    } else if (!p2.getLocation().toVector().equals(loc_check_p2)) {
                         arena.sendCancelMessage(p2);
+                        arena.reset();
                         break;
                     }
                 }
@@ -60,11 +61,14 @@ public class StartDuel implements Runnable {
                 if (time >= 5) { //countdown
                     arena.startDuel();
                     break;
-                } else if (time >= 4) {
+                } else if (time >= 4 && !msg1) {
+                    msg1 = true;
                     arena.sendCountdown(1);
-                } else if (time >= 3) {
+                } else if (time >= 3 && !msg2) {
+                    msg2 = true;
                     arena.sendCountdown(2);
-                } else if (time >= 2) {
+                } else if (time >= 2 && !msg3) {
+                    msg3 = true;
                     arena.sendCountdown(3);
                 } 
             }

@@ -6,21 +6,24 @@
 package me.kevupton.duels.events;
 
 import me.kevupton.duels.Duels;
+import me.kevupton.duels.exceptions.ArenaException;
+import me.kevupton.duels.utils.Arena;
 import me.kevupton.duels.utils.DuelMetaData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
  *
  * @author Kevin
  */
-public class PlayerCommandEvent implements Listener {
+public class PlayerAttemptMoveEvent implements Listener {
+    
     @EventHandler
-    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+    public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        if (DuelMetaData.COMMAND_BAN.isOn(player)) {
+        if (DuelMetaData.PREVENT_MOVING.isOn(player)) {
             event.setCancelled(true);
         }
     }

@@ -8,6 +8,7 @@ package me.kevupton.duels.utils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
@@ -22,6 +23,8 @@ import org.bukkit.entity.Player;
  */
 public class Arena {
     private static ArrayList<Arena> arenas = new ArrayList<Arena>();
+
+    
     private int task_id;
     private Player player1;
     private Player player2;
@@ -32,6 +35,7 @@ public class Arena {
     private Duels duels;
     private Player winner;
     private boolean is_end_phase = false;
+    private boolean duel_started = false;
     
     private Location p1_prev_loc;
     private Location p2_prev_loc;
@@ -47,6 +51,41 @@ public class Arena {
         this.spawn1 = spawn1;
         this.spawn2 = spawn2;
         this.duels = Duels.getInstance();
+    }
+    
+    public static void remove(String name) throws ArenaException {
+         Iterator<Arena> iter = arenas.iterator();
+         while (iter.hasNext()) {
+             Arena a = iter.next();
+             if (a.getName().toLowerCase().equals(name.toLowerCase())) {
+                 iter.remove();
+                 Duels.theDatabase().removeArena(name.toLowerCase());
+                 return;
+             }
+         }
+         throw new ArenaException("Arena not found");
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public void setSpawn1(Location l) {
+        this.spawn1 = l;
+    }
+    
+    public void setSpawn2(Location l) {
+        this.spawn2 = l;
+    }
+    
+    public static void updateArena(Object[] data) {
+        String old_name = (String) data[0];
+        Arena a = getArena(old_name);
+        if (a != null) {
+            if (data[1] != null) a.setSpawn1((Location) data[1]);
+            if (data[2] != null) a.setSpawn2((Location) data[2]);
+            Duels.theDatabase().updateArena(data);
+        }
     }
     
     public static void closeAllDuels() {
@@ -74,12 +113,13 @@ public class Arena {
         return spawn2;
     }
     
-    private void reset() {
+    public void reset() {
         player1 = null;
         player2 = null;
         is_available = true;
         winner = null;
         is_end_phase = false;
+        duel_started = false;
     }
     
     public void setUnavailable() {
@@ -87,9 +127,28 @@ public class Arena {
     }
     
     public static  void registerNew(String name, Location spawn1, Location spawn2) throws ArenaException, DatabaseException {
-        Arena a = new Arena(name, spawn1, spawn2);
-        Duels.theDatabase().registerArena(name, spawn1, spawn2);
-        arenas.add(a);
+        if (!arenaNameExists(name)) {
+            Arena a = new Arena(name, spawn1, spawn2);
+            Duels.theDatabase().registerArena(name, spawn1, spawn2);
+            arenas.add(a);
+        } else {
+            throw new ArenaException("Arena already exists");
+        }
+    }
+    
+    public static boolean arenaNameExists(String name) {
+        return (getArena(name) != null);
+    }
+    
+    public static Arena getArena(String name) {
+        Iterator<Arena> iter = arenas.iterator();
+        while (iter.hasNext()) {
+            Arena a = iter.next();
+            if (a.getName().toLowerCase().equals(name.toLowerCase())) {
+                return a;
+            }
+        }
+        return null;
     }
     
     public static void initialise() {
@@ -189,14 +248,25 @@ public class Arena {
 
     public void runOutOfTime() {
         player1.teleport(this.p1_prev_loc);
+        DuelMetaData.remove(player1, DuelMetaData.IN_ARENA);
+        DuelMessage.RUN_OUT_OF_TIME.sendTo(player1);
+        
         player2.teleport(this.p2_prev_loc);
+        DuelMetaData.remove(player2, DuelMetaData.IN_ARENA);
+        DuelMessage.RUN_OUT_OF_TIME.sendTo(player2);
+        
+        DuelMetaData.remove(player1, DuelMetaData.COMMAND_BAN);
+        DuelMetaData.remove(player2, DuelMetaData.COMMAND_BAN);
         reset();
     }
 
     public void startDuel() {
-        DuelMessage.DUEL_STARTED.sendTo(player1);
-        DuelMessage.DUEL_STARTED.sendTo(player2);
+        DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.DUEL_LENGTH);
+        DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.DUEL_LENGTH);
         ActiveDuel.register(this);
+        duel_started = true;
+        DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
+        DuelMetaData.remove(player2, DuelMetaData.PREVENT_MOVING);
     }
 
     private boolean isAvailable() {
@@ -215,14 +285,11 @@ public class Arena {
         
         player1.teleport(spawn1);
         DuelMetaData.assignTo(player1, DuelMetaData.IN_ARENA);
-    }
-
-    public void sendPleaseWaitMessage() {
         
-    }
-
-    public void sendCancelMessage(Player cause) {
-        
+        DuelMetaData.assignTo(player1, DuelMetaData.PREVENT_MOVING);
+        DuelMetaData.assignTo(player2, DuelMetaData.PREVENT_MOVING);
+        DuelMetaData.assignTo(player1, DuelMetaData.COMMAND_BAN);
+        DuelMetaData.assignTo(player2, DuelMetaData.COMMAND_BAN);
     }
 
     public void setLoser(Player player) {
@@ -239,6 +306,7 @@ public class Arena {
     }
     
     public void setWinner(Player player) {
+        DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
         is_end_phase = true;
         DuelMessage.DUEL_WON.sendTo(player, EndDuel.END_TIME + "");
         ActiveDuel.closeDuel(task_id);
@@ -261,5 +329,14 @@ public class Arena {
             EndDuel.closeEnd(task_id);
             returnWinner();
         }
+    }
+
+    public boolean hasStarted() {
+        return duel_started;
+    }
+
+    public void sendCancelMessage(Player player) {
+        DuelMessage.PLAYER_CANCELED_DUEL.sendTo(player1, player.getName());
+        DuelMessage.PLAYER_CANCELED_DUEL.sendTo(player2, player.getName());
     }
 }

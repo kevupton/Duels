@@ -30,7 +30,18 @@ public enum DuelMessage {
     DUEL_STARTED ("Messages.Title.DuelStarted"),
     DUEL_WON ("Messages.Title.DuelWon"),
     DUEL_LOST ("Messages.Title.DuelLost"),
-    NOT_IN_ARENA ("Messages.Player.NotInArena");
+    NOT_IN_ARENA ("Messages.Player.NotInArena"),
+    RUN_OUT_OF_TIME  ("Messages.Title.OutOfTime"),
+    PLAYER_CANCELED_DUEL ("Messages.Player.PlayerCanceledDuel"),
+    ARENA_NOT_FOUND ("Messages.Admin.ArenaNotFound"),
+    PLEASE_COMPLETE_ARENA ("Messages.Admin.PleaseCompleteArena"),
+    ARENA_UPDATE_SUCCESS ("Messages.Admin.ArenaUpdateSuccess"),
+    REMOVE_ARENA_SUCCESS ("Messages.Admin.SuccessRemoveArena"),
+    CANCEL_ARENA_EDIT ("Messages.Admin.CancelAreaEdit"),
+    SPAWN_1_SET ("Messages.Admin.Spawn1Set"),
+    SPAWN_2_SET ("Messages.Admin.Spawn2Set"),
+    STARTED_UPDATING_ARENA ("Messages.Admin.StartedUpdatingArena"),
+    STARTED_CREATING_ARENA ("Messages.Admin.StartedCreatingArena");
     
     private String config;
     
@@ -50,5 +61,12 @@ public enum DuelMessage {
         }
         player.sendMessage(msg);
     }
-    
+
+    void sendTo(Player player, int ... args) {
+        String msg = Duels.getInstance().getConfig().getString(config);
+        for (int i = 0; i < args.length; i++) {
+            msg = msg.replaceAll("\\$" + (i + 1), args[i] + "");
+        }
+        player.sendMessage(msg);
+    }
 }

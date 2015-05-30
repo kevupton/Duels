@@ -6,9 +6,7 @@
 package me.kevupton.duels.processmanager.processes;
 
 import me.kevupton.duels.Duels;
-import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.utils.Arena;
-import org.bukkit.entity.Player;
 
 /**
  *
@@ -16,7 +14,7 @@ import org.bukkit.entity.Player;
  */
 public class ActiveDuel implements Runnable {
     private Arena arena;   
-    private static final int DUEL_LENGTH = 120; //Seconds
+    public static final int DUEL_LENGTH = 120; //Seconds
     
     public ActiveDuel(Arena a) {
         arena = a;

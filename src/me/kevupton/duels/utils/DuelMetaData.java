@@ -16,9 +16,11 @@ import org.bukkit.metadata.FixedMetadataValue;
  * @author Kevin
  */
 public enum DuelMetaData {
+    PREVENT_MOVING ("prevent_move"),
     IN_ARENA        ("in_arena"), 
     IN_COUNTDOWN    ("in_countdown"),
-    EDITTING_ARENA   ("edit_area");
+    EDITTING_ARENA   ("edit_area"),
+    COMMAND_BAN     ("commands_banned");
     
     private String meta_name;
     private static final String PREFIX = "duels_";

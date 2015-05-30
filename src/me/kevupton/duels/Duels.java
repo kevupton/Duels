@@ -2,6 +2,7 @@ package me.kevupton.duels;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import me.kevupton.duels.events.PlayerAttemptMoveEvent;
 import me.kevupton.duels.utils.CommandManager;
 import me.kevupton.duels.events.PlayerCommandEvent;
 import me.kevupton.duels.events.PlayerDieEvent;
@@ -74,5 +75,6 @@ public class Duels extends JavaPlugin {
     private void registerEvents() {
         this.getServer().getPluginManager().registerEvents(new PlayerCommandEvent(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerDieEvent(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerAttemptMoveEvent(), this);
     }
 }

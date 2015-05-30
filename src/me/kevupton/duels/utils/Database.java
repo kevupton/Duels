@@ -198,5 +198,31 @@ public class Database {
         
         return rs;
     }
+
+    public void removeArena(String name) {
+        String sql = "DELETE FROM arenas WHERE name = '" + name + "'";
+        query(sql);
+    }
+
+    public void updateArena(Object[] data) {
+        if (data[1] == null && data[2] == null) return;
+        String set = "";
+        if (data[1] != null) {
+            Location l = (Location) data[1];
+            set += ", spawn1_x = " + l.getX();
+            set += ", spawn1_y = " + l.getY();
+            set += ", spawn1_z = " + l.getZ();
+            set += ", spawn1_world = '" + l.getWorld().getName() + "'";
+        }
+        if (data[2] != null) {
+            Location l = (Location) data[2];
+            set += ", spawn2_x = " + l.getX();
+            set += ", spawn2_y = " + l.getY();
+            set += ", spawn2_z = " + l.getZ();
+            set += ", spawn2_world = '" + l.getWorld().getName() + "'";
+        }
+        String sql = "UPDATE arenas SET " + set + " WHERE name = '" + (String) data[0] + "'";
+        query(sql);
+    }
 }
 
