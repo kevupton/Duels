@@ -3,10 +3,20 @@ Messages:
     ArenaNameExists: 'This name is already taken'
     NotEdittingArena: 'Not currently editting any arenas'
     NotFinishedEditting: 'Please finish setting up all spawn points before saving'
+    ArenaCreateSuccess: 'Successfully created the arena'
   Player:
     SendToSelf: 'Cannot send a duel request to yourself.' 
     RequestExists: 'A duel request between you two already exists.'
     NoAvailableArenas: 'Sorry there are no arenas currently available.'
     RequestNotExists: 'No request exists between you and that player.'
     InvalidCommand: 'Invalid Command'
-    
+    PlayerNotOnline: 'The specified player is not currently online'
+    SendDuelRequest: '$1 has sent you a duel request. type "/duel accept $1" to accept'
+    DuelLoading: 'You will be transported to the arena in 3 seconds. Move to cancel.'
+    SendDuelSent: 'Your request has been sent'
+    NotInArena: 'You are not currently in an arena'
+  Title:
+    SendCountdown: 'Duel will begin in $1 seconds...'
+    DuelStarted: 'Match has begun!'
+    DuelWon: 'Congratulations you won the duel! You have 30 seconds to collect the loot...'
+    DuelLost: 'Duel lost...'

@@ -18,7 +18,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 public enum DuelMetaData {
     IN_ARENA        ("in_arena"), 
     IN_COUNTDOWN    ("in_countdown"),
-    EDITING_ARENA   ("edit_area");
+    EDITTING_ARENA   ("edit_area");
     
     private String meta_name;
     private static final String PREFIX = "duels_";
@@ -57,11 +57,16 @@ public enum DuelMetaData {
     }
     
     public static boolean isEdittingArena(Player player) {
-        return playerHasMeta(player, DuelMetaData.EDITING_ARENA);
+        try {
+            getMetaValue(player, DuelMetaData.EDITTING_ARENA);
+        } catch(Exception e) {
+            remove(player, DuelMetaData.EDITTING_ARENA);
+        }
+        return playerHasMeta(player, DuelMetaData.EDITTING_ARENA);
     }
     
     public static Object getMetaValue(Player player, DuelMetaData data) {
-        return player.getMetadata(data.val()).get(0);
+        return player.getMetadata(data.val()).get(0).value();
     }
     
     public static void setMetaValue(Player player, DuelMetaData data, Object val) {
@@ -71,14 +76,14 @@ public enum DuelMetaData {
     
     public static boolean isCompletedEdittingArena(Player player) {
         if (!isEdittingArena(player)) return false;
-        Object[] data = (Object[]) getMetaValue(player, DuelMetaData.EDITING_ARENA);
+        Object[] data = (Object[]) getMetaValue(player, DuelMetaData.EDITTING_ARENA);
         return (data[0] != null && data[1] != null && data[2] != null);
     }
     
     public static Object[] getEdittingArenaData(Player player) {
         Object[] data;
         if (isEdittingArena(player)) {
-            data = (Object[]) getMetaValue(player, DuelMetaData.EDITING_ARENA);
+            data = (Object[]) getMetaValue(player, DuelMetaData.EDITTING_ARENA);
         } else {
             data = new Object[4];
         }
@@ -89,22 +94,22 @@ public enum DuelMetaData {
         Object[] data = getEdittingArenaData(player);
         data[0] = name;
         data[3] = command;
-        setMetaValue(player, DuelMetaData.EDITING_ARENA, data);
+        setMetaValue(player, DuelMetaData.EDITTING_ARENA, data);
     }
     
     public static void updateArenaSpawn1(Player player, Location spawn1) {
         Object[] data = getEdittingArenaData(player);
         data[1] = spawn1;
-        setMetaValue(player, DuelMetaData.EDITING_ARENA, data);
+        setMetaValue(player, DuelMetaData.EDITTING_ARENA, data);
     }
     
     public static void updateArenaSpawn2(Player player, Location spawn2) {
         Object[] data = getEdittingArenaData(player);
         data[2] = spawn2;
-        setMetaValue(player, DuelMetaData.EDITING_ARENA, data);
+        setMetaValue(player, DuelMetaData.EDITTING_ARENA, data);
     }
     
     public static void removeEdittingArena(Player player) {
-        remove(player, DuelMetaData.EDITING_ARENA);
+        remove(player, DuelMetaData.EDITTING_ARENA);
     }
 }

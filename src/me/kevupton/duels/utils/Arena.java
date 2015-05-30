@@ -12,6 +12,7 @@ import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
+import me.kevupton.duels.processmanager.processes.EndDuel;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -30,6 +31,8 @@ public class Arena {
     private Location spawn1;
     private Location spawn2;
     private Duels duels;
+    private Player winner;
+    private boolean is_end_phase = false;
     
     private Location p1_prev_loc;
     private Location p2_prev_loc;
@@ -72,10 +75,12 @@ public class Arena {
         return spawn2;
     }
     
-    private void clear() {
+    private void reset() {
         player1 = null;
         player2 = null;
         is_available = true;
+        winner = null;
+        is_end_phase = false;
     }
     
     public void setUnavailable() {
@@ -186,11 +191,12 @@ public class Arena {
     public void runOutOfTime() {
         player1.teleport(this.p1_prev_loc);
         player2.teleport(this.p2_prev_loc);
-        
-        is_available = true;
+        reset();
     }
 
     public void startDuel() {
+        DuelMessage.DUEL_STARTED.sendTo(player1);
+        DuelMessage.DUEL_STARTED.sendTo(player2);
         ActiveDuel.register(this);
     }
 
@@ -200,9 +206,8 @@ public class Arena {
 
     public void sendCountdown(int i) {
         String format = duels.getConfig().getString("Title.Countdown");
-        format = format.replace("%no%", i + "");
-        player1.sendMessage(format);
-        player2.sendMessage(format);
+        DuelMessage.SEND_COUNTDOWN.sendTo(player1, i + "");
+        DuelMessage.SEND_COUNTDOWN.sendTo(player2, i + "");
     }
 
     public void teleportPlayers() {
@@ -223,6 +228,7 @@ public class Arena {
 
     public void setLoser(Player player) {
         if (this.containsPlayer(player)) {
+            DuelMessage.DUEL_LOST.sendTo(player);
             if (player1.equals(player)) {
                 setWinner(player2);
             } else if (player2.equals(player)) {
@@ -234,10 +240,26 @@ public class Arena {
     }
     
     public void setWinner(Player player) {
-        sendWinnerMessage(player);
+        is_end_phase = true;
+        DuelMessage.DUEL_WON.sendTo(player);
+        ActiveDuel.closeDuel(task_id);
+        EndDuel.register(this);
+        winner = player;
+    }
+
+    public void returnWinner() {
+        if (winner.equals(player1)) {
+            winner.teleport(p1_prev_loc);
+        } else {
+            winner.teleport(p2_prev_loc);
+        }
+        reset();
     }
     
-    private void sendWinnerMessage(Player player) {
-        
+    public void endEarly() {
+        if (is_end_phase) {
+            EndDuel.closeEnd(task_id);
+            returnWinner();
+        }
     }
 }

@@ -7,6 +7,7 @@ package me.kevupton.duels.processmanager.processes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
@@ -18,7 +19,7 @@ import org.bukkit.entity.Player;
  * @author Kevin
  */
 public class DuelRequest implements Runnable {
-    private static Map<String, ArrayList<Object[]>> pending_requests = new HashMap<String, ArrayList<Object[]>> ();
+    private static volatile Map<String, ArrayList<Object[]>> pending_requests = new HashMap<String, ArrayList<Object[]>> ();
     private Player receiver;
     private Player sender;
     
@@ -83,21 +84,32 @@ public class DuelRequest implements Runnable {
     }
     
     private static Integer getTaskId(Player receiver, Player sender) {
-        for (Object[] data: pending_requests.get(receiver.getName())) {
-            if (data[0].equals(sender)) {
-                return (Integer) data[1];
+        ArrayList<Object[]> list = pending_requests.get(receiver.getName());
+        if (list != null) {
+            for (Object[] data: list) {
+                if (data[0].equals(sender)) {
+                    return (Integer) data[1];
+                }
             }
         }
         return null;
     }
     
     private static void removeRequest(Player receiver, Player sender) {
-        ArrayList<Object[]> list = pending_requests.get(receiver.getName());
-        for (Object[] data: list) {
-            if (data[0].equals(sender)) {
-                list.remove(data);
+        try {
+            ArrayList<Object[]> list = pending_requests.get(receiver.getName());
+            Iterator<Object[]> iter = list.iterator();
+            while (iter.hasNext()) {
+                Object[] data = iter.next();
+                if (data[0].equals(sender)) {
+                    iter.remove();
+                }
             }
+        } catch(Exception e) {
+            Duels.logInfo(e.toString());
+            e.printStackTrace();
         }
+        
     }
     
     private static void closeRequest(Player receiver, Player sender) throws DuelRequestException {

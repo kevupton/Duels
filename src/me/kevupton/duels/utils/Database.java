@@ -20,9 +20,13 @@ public class Database {
     private Connection  conn = null;
     public  boolean     CONNECTED = false;
     private Duels plugin;
+    private final String NAME;
+    private final String VERSION;
     
     public Database(Duels pn) {
         plugin = pn;
+        NAME = plugin.getDescription().getName().toLowerCase();
+        VERSION = plugin.getDescription().getVersion();
     }
     
     public void closeConnection() {
@@ -85,7 +89,7 @@ public class Database {
     }
     
     public String getVersion() {
-        String sql = "SELECT * FROM secretdoors";
+        String sql = "SELECT * FROM " + NAME;
         ResultSet rs = getResults(sql);
         try {
             return rs.getString("version");
@@ -95,7 +99,7 @@ public class Database {
     }
     
     public void updateVersion(String version) {
-        String sql = "UPDATE secretdoors SET version = '" + version + "'";
+        String sql = "UPDATE " + NAME + " SET version = '" + version + "'";
         query(sql);
     }
     
@@ -113,13 +117,13 @@ public class Database {
 
         query(sql);
 
-        sql = "CREATE TABLE IF NOT EXISTS \"main\".\"secretdoors\" (" +
+        sql = "CREATE TABLE IF NOT EXISTS \"main\".\"duels\" (" +
                 "\"version\" VARCHAR (10) NOT NULL PRIMARY KEY " +
                 ")";
 
         query(sql);
         
-        sql = "INSERT INTO secretdoors VALUES('" + plugin.getDescription().getVersion() + "')";
+        sql = "INSERT INTO " + NAME + " VALUES('" + VERSION + "')";
         query(sql);
     }
     

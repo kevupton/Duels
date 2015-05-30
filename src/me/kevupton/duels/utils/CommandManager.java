@@ -5,6 +5,8 @@
  */
 package me.kevupton.duels.utils;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
@@ -34,7 +36,8 @@ public class CommandManager {
         SET_SPAWN_1 ("setspawn1"),
         SET_SPAWN_2 ("setspawn2"),
         SAVE        ("save"),
-        UPDATE_ARENA ("update");
+        UPDATE_ARENA ("update"),
+        LEAVE ("leave");
         
         private String command;
         
@@ -72,16 +75,30 @@ public class CommandManager {
         switch (cmd) {
             case DUEL:
                 if (args.length == 1) {
-                    Player receiver = Duels.getInstance().getServer().getPlayer(args[0]);
-                    if (receiver != null) {
-                        if (player.equals(receiver)) {
-                            DuelMessage.CANNOT_SEND_TO_SELF.sendTo(player);
-                        } else {
-                            try {
-                                DuelRequest.register(receiver, player);
-                            } catch (DuelRequestException ex) {
-                                DuelMessage.DUEL_REQUEST_EXISTS.sendTo(player);
+                    String cmd_arg = args[0];
+                    if (cmd_arg.equals(DuelCommand.LEAVE.toString())) {
+                        try {
+                            Arena arena = Arena.getPlayerArena(player);
+                            arena.endEarly();
+                        } catch (ArenaException ex) {
+                            DuelMessage.NOT_IN_ARENA.sendTo(player);
+                        }
+                    } else {
+                        Player receiver = Duels.getInstance().getServer().getPlayer(args[0]);
+                        if (receiver != null) {
+                            if (player.equals(receiver)) {
+                                DuelMessage.CANNOT_SEND_TO_SELF.sendTo(player);
+                            } else {
+                                try {
+                                    DuelRequest.register(receiver, player);
+                                    DuelMessage.SEND_DUEL_SENT.sendTo(player);
+                                    DuelMessage.SEND_DUEL_REQUEST.sendTo(receiver, player.getName());
+                                } catch (DuelRequestException ex) {
+                                    DuelMessage.DUEL_REQUEST_EXISTS.sendTo(player);
+                                }
                             }
+                        } else {
+                            DuelMessage.PLAYER_NOT_ONLINE.sendTo(player);
                         }
                     }
                 } else if (args.length == 2 && 
@@ -90,12 +107,16 @@ public class CommandManager {
                     if (sender != null) {
                         try {
                             DuelRequest.acceptRequest(player, sender);
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(player);
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(sender);
                         } catch (DuelRequestException ex) {
                             DuelMessage.DUEL_REQUEST_DOESNT_EXIST.sendTo(player);
                         } catch (ArenaException ex) {
                             DuelMessage.NO_AVAILABLE_ARENAS.sendTo(player);
                             DuelMessage.NO_AVAILABLE_ARENAS.sendTo(sender);
                         }
+                    } else {
+                        DuelMessage.PLAYER_NOT_ONLINE.sendTo(player);
                     }
                 } else {
                     throw new DuelCommandException("Invalid Command");
@@ -137,6 +158,7 @@ public class CommandManager {
                                     DuelCommand sub_cmd = (DuelCommand) data[3];
                                     if (sub_cmd.equals(DuelCommand.CREATE_ARENA)) {
                                         Duels.theDatabase().registerArena((String) data[0], (Location) data[1], (Location) data[2]);
+                                        DuelMessage.ARENA_CREATE_SUCCESS.sendTo(player);
                                     } else {
                                         
                                     }

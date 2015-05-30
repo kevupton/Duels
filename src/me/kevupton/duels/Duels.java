@@ -27,6 +27,8 @@ public class Duels extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        this.saveDefaultConfig();
+        this.reloadConfig();
         registerEvents();
         db.setupConnection();
         Arena.initialise();
@@ -46,7 +48,7 @@ public class Duels extends JavaPlugin {
         } catch (DuelCommandException ex) {
             DuelMessage.INVALID_COMMAND.sendTo((Player) sender);
         }
-        return false;
+        return true;
     }
     
     public Database getLocalDatabase() {
