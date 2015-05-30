@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
+import me.kevupton.duels.exceptions.DatabaseException;
 import org.bukkit.Location;
 
 
@@ -126,22 +127,14 @@ public class Database {
     public ResultSet getAllArenas() {
         if (!CONNECTED) return null;
         
-        Location bLoc = block.getLocation();
-        String pname = player.getName();
-        String world = block.getWorld().getName();
-        int x = (int) bLoc.getX();
-        int y = (int) bLoc.getY();
-        int z = (int) bLoc.getZ();
-        
-        String sql = "insert into secretblocks (player_name, material, location_x, location_y, location_z, world)" +
-                " values ('" + pname + "'," + "'" + m.name() + "', " + x + "," + y + "," + z + ", '" + world + "')";
-        query(sql);
+        String sql = "SELECT * FROM arenas";
 
-        return getSecretBlock(block);
+        return getResults(sql);
     }
     
-    public void registerArena(String name, Location spawn1, Location spawn2) {
+    public void registerArena(String name, Location spawn1, Location spawn2) throws DatabaseException {
         if (!CONNECTED) return;
+        if (arenaNameExists(name)) throw new DatabaseException("Name Exists");
         
         String world1 = spawn1.getWorld().getName();
         int x1 = (int) spawn1.getX();
