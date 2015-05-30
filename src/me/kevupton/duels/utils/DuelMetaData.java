@@ -41,11 +41,11 @@ public enum DuelMetaData {
     }
     
     public boolean isOn(Player player) {
-        return player.hasMetadata(meta_name);
+        return player.hasMetadata(val());
     }
     
     public void removeFrom(Player player) {
-        player.removeMetadata(meta_name, Duels.getInstance());
+        player.removeMetadata(val(), Duels.getInstance());
     }
     
     public static void remove(Player player, DuelMetaData value) {

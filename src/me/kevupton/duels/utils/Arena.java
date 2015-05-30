@@ -15,7 +15,6 @@ import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import me.kevupton.duels.processmanager.processes.EndDuel;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 /**
  *
@@ -142,7 +141,7 @@ public class Arena {
     }
     
     public boolean containsPlayer(Player p) {
-        return (player1.equals(p) || player2.equals(p));
+        return ((player1 != null && player1.equals(p)) || (player2 != null && player2.equals(p)));
     }
     
     public void addPlayer1(Player p) {
@@ -212,10 +211,10 @@ public class Arena {
 
     public void teleportPlayers() {
         player2.teleport(spawn2);
-        player2.setMetadata(DuelMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
+        DuelMetaData.assignTo(player2, DuelMetaData.IN_ARENA);
         
         player1.teleport(spawn1);
-        player1.setMetadata(DuelMetaData.IN_ARENA.val(), new FixedMetadataValue(duels, true));
+        DuelMetaData.assignTo(player1, DuelMetaData.IN_ARENA);
     }
 
     public void sendPleaseWaitMessage() {
@@ -241,13 +240,14 @@ public class Arena {
     
     public void setWinner(Player player) {
         is_end_phase = true;
-        DuelMessage.DUEL_WON.sendTo(player);
+        DuelMessage.DUEL_WON.sendTo(player, EndDuel.END_TIME + "");
         ActiveDuel.closeDuel(task_id);
         EndDuel.register(this);
         winner = player;
     }
 
     public void returnWinner() {
+        DuelMetaData.remove(winner, DuelMetaData.IN_ARENA);
         if (winner.equals(player1)) {
             winner.teleport(p1_prev_loc);
         } else {

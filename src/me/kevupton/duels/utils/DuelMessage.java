@@ -47,8 +47,6 @@ public enum DuelMessage {
         String msg = Duels.getInstance().getConfig().getString(config);
         for (int i = 0; i < args.length; i++) {
             msg = msg.replaceAll("\\$" + (i + 1), args[i]);
-            Duels.logInfo("\\$" + (i + 1));
-            Duels.logInfo(msg);
         }
         player.sendMessage(msg);
     }

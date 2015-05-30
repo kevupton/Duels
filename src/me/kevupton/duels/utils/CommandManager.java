@@ -13,6 +13,7 @@ import me.kevupton.duels.exceptions.DatabaseException;
 import me.kevupton.duels.exceptions.DuelCommandException;
 import me.kevupton.duels.exceptions.DuelRequestException;
 import me.kevupton.duels.processmanager.processes.DuelRequest;
+import me.kevupton.duels.processmanager.processes.StartDuel;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -107,8 +108,8 @@ public class CommandManager {
                     if (sender != null) {
                         try {
                             DuelRequest.acceptRequest(player, sender);
-                            DuelMessage.DUEL_LOADING_MSG.sendTo(player);
-                            DuelMessage.DUEL_LOADING_MSG.sendTo(sender);
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(player, StartDuel.LOAD_TIME + "");
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(sender, StartDuel.LOAD_TIME + "");
                         } catch (DuelRequestException ex) {
                             DuelMessage.DUEL_REQUEST_DOESNT_EXIST.sendTo(player);
                         } catch (ArenaException ex) {

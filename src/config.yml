@@ -12,11 +12,11 @@ Messages:
     InvalidCommand: 'Invalid Command'
     PlayerNotOnline: 'The specified player is not currently online'
     SendDuelRequest: '$1 has sent you a duel request. type "/duel accept $1" to accept'
-    DuelLoading: 'You will be transported to the arena in 3 seconds. Move to cancel.'
+    DuelLoading: 'You will be transported to the arena in $1 seconds. Move to cancel.'
     SendDuelSent: 'Your request has been sent'
     NotInArena: 'You are not currently in an arena'
   Title:
     SendCountdown: 'Duel will begin in $1 seconds...'
     DuelStarted: 'Match has begun!'
-    DuelWon: 'Congratulations you won the duel! You have 30 seconds to collect the loot...'
+    DuelWon: 'Congratulations you won the duel! You have $1 seconds to collect the loot...'
     DuelLost: 'Duel lost...'

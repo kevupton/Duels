@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class StartDuel implements Runnable {
     private Arena arena;   
     private boolean started = false;
+    public static final int LOAD_TIME = 3;
     
     public StartDuel(Arena a) {
         arena = a;
@@ -42,7 +43,7 @@ public class StartDuel implements Runnable {
                     wait_message_sent = true;
                     arena.sendPleaseWaitMessage();
                 }
-                if (time >= 3) {
+                if (time >= LOAD_TIME) {
                     arena.teleportPlayers();
                     start_time = time;
                     entered_arena = true;
