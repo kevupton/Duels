@@ -14,14 +14,25 @@ import me.kevupton.duels.utils.Arena;
  */
 public class ActiveDuel implements Runnable {
     private Arena arena;   
-    public static final int DUEL_LENGTH = 120; //Seconds
+    
+    private static final String CONFIG_SETTINGS = "Settings.DuelTime"; //seconds
+    private static Integer CONF_VAL = null;
     
     public ActiveDuel(Arena a) {
         arena = a;
     }
     
     private static int getDuelLength() {
-        return DUEL_LENGTH * Duels.TICKS_PER_SECOND;
+        return getConfigVal() * Duels.TICKS_PER_SECOND;
+    }
+    
+    public static int getConfigVal() {
+        if (CONF_VAL == null) {
+            CONF_VAL = Duels.getInstance().getConfig().getInt(CONFIG_SETTINGS);
+            return CONF_VAL;
+        } else {
+            return CONF_VAL;
+        }
     }
     
     @Override

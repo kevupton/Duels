@@ -25,10 +25,9 @@ public class PlayerDieEvent implements Listener {
         if (event.getEntityType().equals(EntityType.PLAYER)) {
             Player player = (Player) event.getEntity();
             if (DuelMetaData.IN_ARENA.isOn(player)) {
-                DuelMetaData.remove(player, DuelMetaData.IN_ARENA);
-                DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
                 try {
                     Arena arena = Arena.getPlayerArena(player);
+                    arena.resetPlayer(player);
                     arena.setLoser(player);
                 } catch (ArenaException ex) {
                     Duels.logInfo("ERROR: Player expected in arena but not found");

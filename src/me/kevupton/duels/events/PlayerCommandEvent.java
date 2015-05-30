@@ -20,6 +20,7 @@ public class PlayerCommandEvent implements Listener {
     @EventHandler
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
         Player player = event.getPlayer();
+        Duels.logInfo(event.getMessage());
         if (DuelMetaData.COMMAND_BAN.isOn(player)) {
             event.setCancelled(true);
         }

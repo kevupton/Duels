@@ -43,7 +43,7 @@ public enum DuelMessage {
     SPAWN_2_SET ("Messages.Admin.Spawn2Set"),
     STARTED_UPDATING_ARENA ("Messages.Admin.StartedUpdatingArena"),
     STARTED_CREATING_ARENA ("Messages.Admin.StartedCreatingArena"),
-    SEND_LEAVE_EARLY ("Messages.Admin.SendLeaveEarly");
+    SEND_LEAVE_EARLY ("Messages.Player.SendLeaveEarly");
     
     private String config;
     

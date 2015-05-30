@@ -23,7 +23,8 @@ public class DuelRequest implements Runnable {
     private Player receiver;
     private Player sender;
     
-    private static final int REQUEST_LENGTH = 30; //seconds
+    private static final String CONFIG_SETTINGS = "Settings.RequestLife"; //seconds
+    private static Integer CONF_VAL = null;
     
     private DuelRequest(Player r, Player s) {
         receiver = r;
@@ -41,8 +42,17 @@ public class DuelRequest implements Runnable {
         return (getTaskId(receiver, sender) != null);
     }
     
+    public static int getConfigVal() {
+        if (CONF_VAL == null) {
+            CONF_VAL = Duels.getInstance().getConfig().getInt(CONFIG_SETTINGS);
+            return CONF_VAL;
+        } else {
+            return CONF_VAL;
+        }
+    }
+    
     private static long getRequestLength() {
-        return Duels.TICKS_PER_SECOND * REQUEST_LENGTH;
+        return Duels.TICKS_PER_SECOND * getConfigVal();
     }
     
     public static void register(Player receiver, Player sender) throws DuelRequestException {

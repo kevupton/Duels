@@ -20,7 +20,8 @@ import org.bukkit.util.Vector;
 public class StartDuel implements Runnable {
     private Arena arena;   
     private boolean started = false;
-    public static final int LOAD_TIME = 3;
+    private static final String CONFIG_SETTINGS = "Settings.WarmupTime"; //seconds
+    private static Integer CONF_VAL = null;
     
     public StartDuel(Arena a) {
         arena = a;
@@ -44,7 +45,7 @@ public class StartDuel implements Runnable {
             if (arena.hasWinner()) break;
             
             if (!entered_arena) {
-                if (time >= LOAD_TIME) {
+                if (time >= getConfigVal()) {
                     arena.teleportPlayers();
                     start_time = System.currentTimeMillis();
                     entered_arena = true;
@@ -74,6 +75,15 @@ public class StartDuel implements Runnable {
                     arena.sendCountdown(3);
                 } 
             }
+        }
+    }
+    
+    public static int getConfigVal() {
+        if (CONF_VAL == null) {
+            CONF_VAL = Duels.getInstance().getConfig().getInt(CONFIG_SETTINGS);
+            return CONF_VAL;
+        } else {
+            return CONF_VAL;
         }
     }
     

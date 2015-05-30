@@ -112,8 +112,8 @@ public class CommandManager {
                     if (sender != null) {
                         try {
                             DuelRequest.acceptRequest(player, sender);
-                            DuelMessage.DUEL_LOADING_MSG.sendTo(player, StartDuel.LOAD_TIME + "");
-                            DuelMessage.DUEL_LOADING_MSG.sendTo(sender, StartDuel.LOAD_TIME + "");
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(player, StartDuel.getConfigVal());
+                            DuelMessage.DUEL_LOADING_MSG.sendTo(sender, StartDuel.getConfigVal());
                         } catch (DuelRequestException ex) {
                             DuelMessage.DUEL_REQUEST_DOESNT_EXIST.sendTo(player);
                         } catch (ArenaException ex) {

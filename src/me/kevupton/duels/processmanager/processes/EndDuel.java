@@ -6,9 +6,7 @@
 package me.kevupton.duels.processmanager.processes;
 
 import me.kevupton.duels.Duels;
-import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.utils.Arena;
-import org.bukkit.entity.Player;
 
 /**
  *
@@ -16,19 +14,29 @@ import org.bukkit.entity.Player;
  */
 public class EndDuel implements Runnable {
     private Arena arena;   
-    public static final int END_TIME = 15; //Seconds
+    private static final String CONFIG_SETTINGS = "Settings.LootTime"; //Seconds
+    private static Integer CONF_VAL = null;
     
     public EndDuel(Arena a) {
         arena = a;
     }
     
     private static int getTimeLength() {
-        return END_TIME * Duels.TICKS_PER_SECOND;
+        return getConfigVal() * Duels.TICKS_PER_SECOND;
     }
     
     @Override
     public void run() {
         arena.returnWinner();
+    }
+    
+    public static int getConfigVal() {
+        if (CONF_VAL == null) {
+            CONF_VAL = Duels.getInstance().getConfig().getInt(CONFIG_SETTINGS);
+            return CONF_VAL;
+        } else {
+            return CONF_VAL;
+        }
     }
     
     public static void register(Arena arena) {

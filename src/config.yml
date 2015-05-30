@@ -1,3 +1,8 @@
+Settings:
+  DuelTime: 120 #seconds
+  LootTime: 15 #seconds
+  WarmupTime: 3 #seconds
+  RequestLife: 30 #seconds
 Messages:
   Admin:
     ArenaNameExists: '&4This name is already taken'
@@ -25,7 +30,7 @@ Messages:
     SendDuelSent: '&6Your request has been sent'
     NotInArena: '&4You are not currently in an arena'
     PlayerCanceledDuel: '&4Player: $1, has canceled the duel by moving'
-    SendLeaveEarly: '&4 You have decided to leave the arena early.'
+    SendLeaveEarly: '&6You have decided to leave the arena early.'
   Title:
     SendCountdown: '&6Duel will begin in $1 seconds...'
     DuelStarted: '&6Match has begun! You have $1 seconds to defeat your oponent.'

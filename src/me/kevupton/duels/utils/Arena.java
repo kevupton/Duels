@@ -280,8 +280,8 @@ public class Arena {
         } else if (player2 == null && player1 != null) {
             setWinner(player1);
         } else if (player2 != null && player1 != null) {
-            DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.DUEL_LENGTH);
-            DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.DUEL_LENGTH);
+            DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.getConfigVal());
+            DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.getConfigVal());
             duel_started = true;
             ActiveDuel.register(this);
             DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
@@ -330,7 +330,7 @@ public class Arena {
         DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
         DuelMetaData.remove(player, DuelMetaData.PREVENT_MOVING);
         is_end_phase = true;
-        DuelMessage.DUEL_WON.sendTo(player, EndDuel.END_TIME + "");
+        DuelMessage.DUEL_WON.sendTo(player, EndDuel.getConfigVal());
         ActiveDuel.closeDuel(task_id);
         EndDuel.register(this);
         winner = player;
