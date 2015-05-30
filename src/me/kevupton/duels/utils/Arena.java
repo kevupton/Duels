@@ -8,8 +8,6 @@ package me.kevupton.duels.utils;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
@@ -219,6 +217,26 @@ public class Arena {
     }
 
     public void sendCancelMessage(Player cause) {
+        
+    }
+
+    public void setLoser(Player player) {
+        if (this.containsPlayer(player)) {
+            if (player1.equals(player)) {
+                setWinner(player2);
+            } else if (player2.equals(player)) {
+                setWinner(player1);
+            }
+        } else {
+            Duels.logInfo("None of the players match the players associated to the arena");
+        }
+    }
+    
+    public void setWinner(Player player) {
+        sendWinnerMessage(player);
+    }
+    
+    private void sendWinnerMessage(Player player) {
         
     }
 }

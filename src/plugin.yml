@@ -2,3 +2,23 @@ name: Duels
 main: me.kevupton.duels.Duels
 version: "1"
 author: Kevupton
+
+commands:
+  duel:
+    description: The duel manager.
+    usage: /<command>
+    permission: duels.duel
+    permission-message: You don't have permission to perform this command!
+  dueladmin:
+    description: The duel admin manager to create a new arena.
+    usage: /<command>
+    permission: duels.dueladmin
+    permission-message: You don't have permission to perform this command!
+  
+permissions:
+  duels.duel:
+    description: Allows the request to duel
+    default: true
+  duels.dueladmin:
+    description: Allows the creation of new arenas
+    default: op
