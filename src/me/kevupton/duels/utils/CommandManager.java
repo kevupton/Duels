@@ -83,6 +83,7 @@ public class CommandManager {
                         try {
                             Arena arena = Arena.getPlayerArena(player);
                             arena.endEarly();
+                            DuelMessage.SEND_LEAVE_EARLY.sendTo(player);
                         } catch (ArenaException ex) {
                             DuelMessage.NOT_IN_ARENA.sendTo(player);
                         }

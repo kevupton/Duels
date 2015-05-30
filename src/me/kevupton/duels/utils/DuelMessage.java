@@ -6,6 +6,7 @@
 package me.kevupton.duels.utils;
 
 import me.kevupton.duels.Duels;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -41,7 +42,8 @@ public enum DuelMessage {
     SPAWN_1_SET ("Messages.Admin.Spawn1Set"),
     SPAWN_2_SET ("Messages.Admin.Spawn2Set"),
     STARTED_UPDATING_ARENA ("Messages.Admin.StartedUpdatingArena"),
-    STARTED_CREATING_ARENA ("Messages.Admin.StartedCreatingArena");
+    STARTED_CREATING_ARENA ("Messages.Admin.StartedCreatingArena"),
+    SEND_LEAVE_EARLY ("Messages.Admin.SendLeaveEarly");
     
     private String config;
     
@@ -51,7 +53,7 @@ public enum DuelMessage {
     
     public void sendTo(Player player) {
         String msg = Duels.getInstance().getConfig().getString(config);
-        player.sendMessage(msg);
+        sendMessage(player, msg);
     }
     
     public void sendTo(Player player, String ... args) {
@@ -59,14 +61,19 @@ public enum DuelMessage {
         for (int i = 0; i < args.length; i++) {
             msg = msg.replaceAll("\\$" + (i + 1), args[i]);
         }
-        player.sendMessage(msg);
+        sendMessage(player, msg);
     }
 
-    void sendTo(Player player, int ... args) {
+    public void sendTo(Player player, int ... args) {
         String msg = Duels.getInstance().getConfig().getString(config);
         for (int i = 0; i < args.length; i++) {
             msg = msg.replaceAll("\\$" + (i + 1), args[i] + "");
         }
+        sendMessage(player, msg);
+    }
+    
+    private void sendMessage(Player player, String msg) {
+        msg = ChatColor.translateAlternateColorCodes('&', msg);
         player.sendMessage(msg);
     }
 }
