@@ -9,8 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.DatabaseException;
 import org.bukkit.Location;
@@ -110,10 +108,14 @@ public class Database {
                 "\"spawn1_x\" INTEGER NOT NULL  DEFAULT 0, " +
                 "\"spawn1_y\" INTEGER NOT NULL  DEFAULT 0, " +
                 "\"spawn1_z\" INTEGER NOT NULL  DEFAULT 0, " +
+                "\"spawn1_yaw\" FLOAT NOT NULL, " +
+                "\"spawn1_pitch\" FLOAT NOT NULL, " + 
                 "\"spawn1_world\" VARCHAR(100), " +
                 "\"spawn2_x\" INTEGER NOT NULL  DEFAULT 0, " +
                 "\"spawn2_y\" INTEGER NOT NULL  DEFAULT 0, " +
                 "\"spawn2_z\" INTEGER NOT NULL  DEFAULT 0, " +
+                "\"spawn2_yaw\" FLOAT NOT NULL, " +
+                "\"spawn2_pitch\" FLOAT NOT NULL, " + 
                 "\"spawn2_world\" VARCHAR(100))";
 
         query(sql);
@@ -145,16 +147,20 @@ public class Database {
         int x1 = (int) spawn1.getX();
         int y1 = (int) spawn1.getY();
         int z1 = (int) spawn1.getZ();
+        float yaw1 = spawn1.getYaw();
+        float pitch1 = spawn1.getPitch();
         
         String world2 = spawn2.getWorld().getName();
         int x2 = (int) spawn2.getX();
         int y2 = (int) spawn2.getY();
         int z2 = (int) spawn2.getZ();
+        float yaw2 = spawn2.getYaw();
+        float pitch2 = spawn2.getPitch();
         
-        String sql = "insert into arenas (name, spawn1_x, spawn1_y, spawn1_z, spawn1_world, "
-                + "spawn2_x, spawn2_y, spawn2_z, spawn2_world)" +
-                " values ('" + name + "'," + x1 + ", " + y1 + "," + z1 + ", '" + world1 + "'," 
-                + x2 + ", " + y2 + "," + z2 + ", '" + world2 + "')";
+        String sql = "insert into arenas (name, spawn1_x, spawn1_y, spawn1_z, spawn1_yaw, spawn1_pitch, spawn1_world, "
+                + "spawn2_x, spawn2_y, spawn2_z, spawn2_yaw, spawn2_pitch, spawn2_world)" +
+                " values ('" + name + "'," + x1 + ", " + y1 + "," + z1 + "," + yaw1 + "," + pitch1 + ", '" + world1 + "'," 
+                + x2 + ", " + y2 + "," + z2 + "," + yaw2 + "," + pitch2 + ", '" + world2 + "')";
         query(sql);
     }
         
@@ -214,6 +220,8 @@ public class Database {
             set.add("spawn1_x = " + l.getX());
             set.add("spawn1_y = " + l.getY());
             set.add("spawn1_z = " + l.getZ());
+            set.add("spawn1_yaw = " + l.getYaw());
+            set.add("spawn1_pitch = " + l.getPitch());
             set.add("spawn1_world = '" + l.getWorld().getName() + "'");
         }
         if (data[2] != null) {
@@ -221,6 +229,8 @@ public class Database {
             set.add("spawn2_x = " + l.getX());
             set.add("spawn2_y = " + l.getY());
             set.add("spawn2_z = " + l.getZ());
+            set.add("spawn2_yaw = " + l.getYaw());
+            set.add("spawn2_pitch = " + l.getPitch());
             set.add("spawn2_world = '" + l.getWorld().getName() + "'");
         }
         

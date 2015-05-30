@@ -183,13 +183,17 @@ public class Arena {
                     Duels.getInstance().getServer().getWorld(rs.getString("spawn1_world")), 
                     rs.getInt("spawn1_x"),
                     rs.getInt("spawn1_y"),
-                    rs.getInt("spawn1_z")
+                    rs.getInt("spawn1_z"),
+                    rs.getFloat("spawn1_yaw"),
+                    rs.getFloat("spawn1_pitch")
             );
             Location spawn2 = new Location(
                     Duels.getInstance().getServer().getWorld(rs.getString("spawn2_world")), 
                     rs.getInt("spawn2_x"),
                     rs.getInt("spawn2_y"),
-                    rs.getInt("spawn2_z")
+                    rs.getInt("spawn2_z"),
+                    rs.getFloat("spawn2_yaw"),
+                    rs.getFloat("spawn2_pitch")
             );
             String name = rs.getString("name");
             return new Arena(name, spawn1, spawn2);
