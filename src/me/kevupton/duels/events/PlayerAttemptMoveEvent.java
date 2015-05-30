@@ -5,10 +5,8 @@
  */
 package me.kevupton.duels.events;
 
-import me.kevupton.duels.Duels;
-import me.kevupton.duels.exceptions.ArenaException;
-import me.kevupton.duels.utils.Arena;
 import me.kevupton.duels.utils.DuelMetaData;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +22,9 @@ public class PlayerAttemptMoveEvent implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (DuelMetaData.PREVENT_MOVING.isOn(player)) {
-            event.setCancelled(true);
+            Location new_to = event.getFrom().clone();
+            new_to.setDirection(event.getTo().getDirection());
+            event.setTo(new_to);
         }
     }
 }
