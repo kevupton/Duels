@@ -38,7 +38,7 @@ public enum DuelMessage {
     PLEASE_COMPLETE_ARENA ("Messages.Admin.PleaseCompleteArena"),
     ARENA_UPDATE_SUCCESS ("Messages.Admin.ArenaUpdateSuccess"),
     REMOVE_ARENA_SUCCESS ("Messages.Admin.SuccessRemoveArena"),
-    CANCEL_ARENA_EDIT ("Messages.Admin.CancelAreaEdit"),
+    CANCEL_ARENA_EDIT ("Messages.Admin.CancelArenaEdit"),
     SPAWN_1_SET ("Messages.Admin.Spawn1Set"),
     SPAWN_2_SET ("Messages.Admin.Spawn2Set"),
     STARTED_UPDATING_ARENA ("Messages.Admin.StartedUpdatingArena"),
