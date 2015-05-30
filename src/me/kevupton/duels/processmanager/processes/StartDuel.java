@@ -41,6 +41,8 @@ public class StartDuel implements Runnable {
         long time = 0;
         while (true) {
             time = getCurrentTimeInSeconds(start_time);
+            if (arena.hasWinner()) break;
+            
             if (!entered_arena) {
                 if (time >= LOAD_TIME) {
                     arena.teleportPlayers();

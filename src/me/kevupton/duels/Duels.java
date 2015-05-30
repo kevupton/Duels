@@ -6,6 +6,7 @@ import me.kevupton.duels.events.PlayerAttemptMoveEvent;
 import me.kevupton.duels.utils.CommandManager;
 import me.kevupton.duels.events.PlayerCommandEvent;
 import me.kevupton.duels.events.PlayerDieEvent;
+import me.kevupton.duels.events.PlayerLeaveEvent;
 import me.kevupton.duels.exceptions.DuelCommandException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import me.kevupton.duels.utils.Arena;
@@ -76,5 +77,6 @@ public class Duels extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerCommandEvent(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerDieEvent(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerAttemptMoveEvent(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerLeaveEvent(), this);
     }
 }

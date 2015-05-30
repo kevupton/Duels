@@ -8,6 +8,7 @@ package me.kevupton.duels.utils;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
@@ -205,23 +206,25 @@ public class Database {
     }
 
     public void updateArena(Object[] data) {
+        Duels.logInfo(data.toString());
         if (data[1] == null && data[2] == null) return;
-        String set = "";
+        ArrayList<String> set = new ArrayList<String>();
         if (data[1] != null) {
             Location l = (Location) data[1];
-            set += ", spawn1_x = " + l.getX();
-            set += ", spawn1_y = " + l.getY();
-            set += ", spawn1_z = " + l.getZ();
-            set += ", spawn1_world = '" + l.getWorld().getName() + "'";
+            set.add("spawn1_x = " + l.getX());
+            set.add("spawn1_y = " + l.getY());
+            set.add("spawn1_z = " + l.getZ());
+            set.add("spawn1_world = '" + l.getWorld().getName() + "'");
         }
         if (data[2] != null) {
             Location l = (Location) data[2];
-            set += ", spawn2_x = " + l.getX();
-            set += ", spawn2_y = " + l.getY();
-            set += ", spawn2_z = " + l.getZ();
-            set += ", spawn2_world = '" + l.getWorld().getName() + "'";
+            set.add("spawn2_x = " + l.getX());
+            set.add("spawn2_y = " + l.getY());
+            set.add("spawn2_z = " + l.getZ());
+            set.add("spawn2_world = '" + l.getWorld().getName() + "'");
         }
-        String sql = "UPDATE arenas SET " + set + " WHERE name = '" + (String) data[0] + "'";
+        
+        String sql = "UPDATE arenas SET " + String.join(", ", set) + " WHERE name = '" + (String) data[0] + "'";
         query(sql);
     }
 }

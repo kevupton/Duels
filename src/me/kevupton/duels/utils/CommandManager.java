@@ -14,6 +14,7 @@ import me.kevupton.duels.exceptions.DuelCommandException;
 import me.kevupton.duels.exceptions.DuelRequestException;
 import me.kevupton.duels.processmanager.processes.DuelRequest;
 import me.kevupton.duels.processmanager.processes.StartDuel;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -121,6 +122,16 @@ public class CommandManager {
                         }
                     } else {
                         DuelMessage.PLAYER_NOT_ONLINE.sendTo(player);
+                    }
+                } else if (args.length == 0) {
+                    String[] commands = {
+                        ChatColor.GOLD + "Dueling Commands:",
+                        ChatColor.GOLD + "/duel <playername>" + ChatColor.WHITE + " To request a duel",
+                        ChatColor.GOLD + "/duel accept <playername>" + ChatColor.WHITE + " To accept a duel request",
+                        ChatColor.GOLD + "/duel leave" + ChatColor.WHITE + " To leave a completed duel early"
+                    };
+                    for (String c: commands) {
+                        player.sendMessage(c);
                     }
                 } else {
                     throw new DuelCommandException("Invalid Command");

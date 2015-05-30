@@ -90,7 +90,18 @@ public class Arena {
     
     public static void closeAllDuels() {
         ArrayList<Arena> unavailable = getUnavailableArenas();
-        Duels.logInfo("Not yet supported");
+        for (Arena a: unavailable) {
+            a.resetPlayer(a.getPlayer1());
+            a.resetPlayer(a.getPlayer2());
+        }
+    }
+    
+    public void resetPlayer(Player player) {
+        if (player != null) {
+            DuelMetaData.remove(player, DuelMetaData.IN_ARENA);
+            DuelMetaData.remove(player, DuelMetaData.PREVENT_MOVING);
+            DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
+        }
     }
     
     public String getName() {
@@ -247,26 +258,35 @@ public class Arena {
     }
 
     public void runOutOfTime() {
+        DuelMessage.RUN_OUT_OF_TIME.sendTo(player2);
+        DuelMessage.RUN_OUT_OF_TIME.sendTo(player1);
+        
         player1.teleport(this.p1_prev_loc);
         DuelMetaData.remove(player1, DuelMetaData.IN_ARENA);
-        DuelMessage.RUN_OUT_OF_TIME.sendTo(player1);
+        
         
         player2.teleport(this.p2_prev_loc);
         DuelMetaData.remove(player2, DuelMetaData.IN_ARENA);
-        DuelMessage.RUN_OUT_OF_TIME.sendTo(player2);
+        
         
         DuelMetaData.remove(player1, DuelMetaData.COMMAND_BAN);
         DuelMetaData.remove(player2, DuelMetaData.COMMAND_BAN);
         reset();
     }
-
+    
     public void startDuel() {
-        DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.DUEL_LENGTH);
-        DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.DUEL_LENGTH);
-        ActiveDuel.register(this);
-        duel_started = true;
-        DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
-        DuelMetaData.remove(player2, DuelMetaData.PREVENT_MOVING);
+        if (player1 == null && player2 != null) {
+            setWinner(player2);
+        } else if (player2 == null && player1 != null) {
+            setWinner(player1);
+        } else if (player2 != null && player1 != null) {
+            DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.DUEL_LENGTH);
+            DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.DUEL_LENGTH);
+            duel_started = true;
+            ActiveDuel.register(this);
+            DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
+            DuelMetaData.remove(player2, DuelMetaData.PREVENT_MOVING);
+        }
     }
 
     private boolean isAvailable() {
@@ -293,6 +313,7 @@ public class Arena {
     }
 
     public void setLoser(Player player) {
+        if (this.winner != null) return;
         if (this.containsPlayer(player)) {
             DuelMessage.DUEL_LOST.sendTo(player);
             if (player1.equals(player)) {
@@ -307,6 +328,7 @@ public class Arena {
     
     public void setWinner(Player player) {
         DuelMetaData.remove(player, DuelMetaData.COMMAND_BAN);
+        DuelMetaData.remove(player, DuelMetaData.PREVENT_MOVING);
         is_end_phase = true;
         DuelMessage.DUEL_WON.sendTo(player, EndDuel.END_TIME + "");
         ActiveDuel.closeDuel(task_id);
@@ -318,7 +340,7 @@ public class Arena {
         DuelMetaData.remove(winner, DuelMetaData.IN_ARENA);
         if (winner.equals(player1)) {
             winner.teleport(p1_prev_loc);
-        } else {
+        } else  if (winner.equals(player2)) {
             winner.teleport(p2_prev_loc);
         }
         reset();
@@ -338,5 +360,15 @@ public class Arena {
     public void sendCancelMessage(Player player) {
         DuelMessage.PLAYER_CANCELED_DUEL.sendTo(player1, player.getName());
         DuelMessage.PLAYER_CANCELED_DUEL.sendTo(player2, player.getName());
+    }
+
+    public void cancelTask() {
+        if (duel_started) {
+            Duels.getInstance().getServer().getScheduler().cancelTask(task_id);
+        }
+    }
+
+    public boolean hasWinner() {
+        return (winner != null);
     }
 }

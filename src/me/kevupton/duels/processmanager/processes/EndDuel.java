@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
  */
 public class EndDuel implements Runnable {
     private Arena arena;   
-    public static final int END_TIME = 10; //Seconds
+    public static final int END_TIME = 15; //Seconds
     
     public EndDuel(Arena a) {
         arena = a;
