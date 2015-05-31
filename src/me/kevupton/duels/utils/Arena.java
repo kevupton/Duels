@@ -14,11 +14,8 @@ import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import me.kevupton.duels.processmanager.processes.EndDuel;
-import net.minecraft.server.v1_8_R2.IChatBaseComponent;
-import net.minecraft.server.v1_8_R2.PacketPlayOutTitle;
-import net.minecraft.server.v1_8_R2.PlayerConnection;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -289,7 +286,7 @@ public class Arena {
             DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.getConfigVal());
             DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.getConfigVal());
             if (Duels.is18orHigher()) {
-            	sendBigText("FIGHT!", 0, 8, 4);
+            	sendBigText("FIGHT!", 0, 12, 4);
             }
             duel_started = true;
             ActiveDuel.register(this);
@@ -304,7 +301,7 @@ public class Arena {
 
     public void sendCountdown(int i) {
     	if (Duels.is18orHigher()) {
-    		sendBigText(i + "");
+    		sendBigText(i + ".");
     	} else {
 	        DuelMessage.SEND_COUNTDOWN.sendTo(player1, i + "");
 	        DuelMessage.SEND_COUNTDOWN.sendTo(player2, i + "");
@@ -312,21 +309,22 @@ public class Arena {
     }
     
     private void sendBigText(String text) {
-        sendBigText(text, 0,3,2);
+        sendBigText(text, 0, 4, 1);
     }
     
     private void sendBigText(String text, int fadein, int display, int fadeout) {
-        IChatBaseComponent chatTitle = IChatBaseComponent.ChatSerializer.a("{text:\"" + text + ".\",color:gold,bold:true,underlined:false,italic:false,strikethrough:false,obfuscated:false} ");
-        PacketPlayOutTitle packet = new PacketPlayOutTitle(fadein, display, fadeout);
-        PacketPlayOutTitle packet1 = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, chatTitle);
-        PlayerConnection p1con = ((CraftPlayer) player1).getHandle().playerConnection;
-        PlayerConnection p2con = ((CraftPlayer) player2).getHandle().playerConnection;
-        p1con.sendPacket(packet);
-        p1con.sendPacket(packet1);
-        p2con.sendPacket(packet);
-        p2con.sendPacket(packet1);
+        Title title = new Title(text);
+        title.setTimingsToTicks();
+        title.setTitleColor(ChatColor.GOLD);
+        title.setFadeInTime(fadein);
+        title.setFadeOutTime(fadeout);
+        title.setStayTime(display);
+        title.setBold(true);
+        
+        title.send(player1);
+        title.send(player2);
     }
-
+    
     public void teleportPlayers() {
         player2.teleport(spawn2);
         DuelMetaData.assignTo(player2, DuelMetaData.IN_ARENA);

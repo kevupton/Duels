@@ -38,6 +38,5 @@ public class PlayerLeaveEvent implements Listener {
         } catch (ArenaException ex) {
             Duels.logInfo("Arena not found");
         }
-        
     }
 }
