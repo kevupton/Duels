@@ -288,7 +288,9 @@ public class Arena {
         } else if (player2 != null && player1 != null) {
             DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.getConfigVal());
             DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.getConfigVal());
-            sendBigText("FIGHT!", 0, 8, 4);
+            if (Duels.is18orHigher()) {
+            	sendBigText("FIGHT!", 0, 8, 4);
+            }
             duel_started = true;
             ActiveDuel.register(this);
             DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
@@ -301,7 +303,7 @@ public class Arena {
     }
 
     public void sendCountdown(int i) {
-    	if (Duels.getInstance().getServer().getVersion().compareTo("1.8") >= 0) {
+    	if (Duels.is18orHigher()) {
     		sendBigText(i + "");
     	} else {
 	        DuelMessage.SEND_COUNTDOWN.sendTo(player1, i + "");

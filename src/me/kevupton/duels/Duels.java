@@ -79,4 +79,8 @@ public class Duels extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerAttemptMoveEvent(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerLeaveEvent(), this);
     }
+    
+    public static boolean is18orHigher() {
+    	return (getInstance().getServer().getVersion().compareTo("1.8") >= 0);
+    }
 }
