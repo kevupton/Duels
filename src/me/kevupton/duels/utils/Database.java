@@ -105,15 +105,15 @@ public class Database {
     public void createTables() {
         String sql = "CREATE TABLE IF NOT EXISTS \"main\".\"arenas\" (" + 
                 "\"name\" VARCHAR(20) PRIMARY KEY, " + 
-                "\"spawn1_x\" INTEGER NOT NULL  DEFAULT 0, " +
-                "\"spawn1_y\" INTEGER NOT NULL  DEFAULT 0, " +
-                "\"spawn1_z\" INTEGER NOT NULL  DEFAULT 0, " +
+                "\"spawn1_x\" DOUBLE NOT NULL  DEFAULT 0, " +
+                "\"spawn1_y\" DOUBLE NOT NULL  DEFAULT 0, " +
+                "\"spawn1_z\" DOUBLE NOT NULL  DEFAULT 0, " +
                 "\"spawn1_yaw\" FLOAT NOT NULL, " +
                 "\"spawn1_pitch\" FLOAT NOT NULL, " + 
                 "\"spawn1_world\" VARCHAR(100), " +
-                "\"spawn2_x\" INTEGER NOT NULL  DEFAULT 0, " +
-                "\"spawn2_y\" INTEGER NOT NULL  DEFAULT 0, " +
-                "\"spawn2_z\" INTEGER NOT NULL  DEFAULT 0, " +
+                "\"spawn2_x\" DOUBLE NOT NULL  DEFAULT 0, " +
+                "\"spawn2_y\" DOUBLE NOT NULL  DEFAULT 0, " +
+                "\"spawn2_z\" DOUBLE NOT NULL  DEFAULT 0, " +
                 "\"spawn2_yaw\" FLOAT NOT NULL, " +
                 "\"spawn2_pitch\" FLOAT NOT NULL, " + 
                 "\"spawn2_world\" VARCHAR(100))";
@@ -144,16 +144,16 @@ public class Database {
         if (arenaNameExists(name)) throw new DatabaseException("Name Exists");
         
         String world1 = spawn1.getWorld().getName();
-        int x1 = (int) spawn1.getX();
-        int y1 = (int) spawn1.getY();
-        int z1 = (int) spawn1.getZ();
+        double x1 = spawn1.getX();
+        double y1 = spawn1.getY();
+        double z1 = spawn1.getZ();
         float yaw1 = spawn1.getYaw();
         float pitch1 = spawn1.getPitch();
         
         String world2 = spawn2.getWorld().getName();
-        int x2 = (int) spawn2.getX();
-        int y2 = (int) spawn2.getY();
-        int z2 = (int) spawn2.getZ();
+        double x2 = spawn2.getX();
+        double y2 = spawn2.getY();
+        double z2 = spawn2.getZ();
         float yaw2 = spawn2.getYaw();
         float pitch2 = spawn2.getPitch();
         

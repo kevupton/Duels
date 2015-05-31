@@ -5,8 +5,6 @@
  */
 package me.kevupton.duels.utils;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
@@ -124,6 +122,7 @@ public class CommandManager {
                         DuelMessage.PLAYER_NOT_ONLINE.sendTo(player);
                     }
                 } else if (args.length == 0) {
+                    
                     String[] commands = {
                         ChatColor.GOLD + "Dueling Commands:",
                         ChatColor.GOLD + "/duel <playername>" + ChatColor.WHITE + " To request a duel",

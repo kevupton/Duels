@@ -14,7 +14,11 @@ import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.exceptions.DatabaseException;
 import me.kevupton.duels.processmanager.processes.ActiveDuel;
 import me.kevupton.duels.processmanager.processes.EndDuel;
+import net.minecraft.server.v1_8_R2.IChatBaseComponent;
+import net.minecraft.server.v1_8_R2.PacketPlayOutTitle;
+import net.minecraft.server.v1_8_R2.PlayerConnection;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,8 +27,6 @@ import org.bukkit.entity.Player;
  */
 public class Arena {
     private static ArrayList<Arena> arenas = new ArrayList<Arena>();
-
-    
     private int task_id;
     private Player player1;
     private Player player2;
@@ -181,17 +183,17 @@ public class Arena {
         try {
             Location spawn1 = new Location(
                     Duels.getInstance().getServer().getWorld(rs.getString("spawn1_world")), 
-                    rs.getInt("spawn1_x"),
-                    rs.getInt("spawn1_y"),
-                    rs.getInt("spawn1_z"),
+                    rs.getDouble("spawn1_x"),
+                    rs.getDouble("spawn1_y"),
+                    rs.getDouble("spawn1_z"),
                     rs.getFloat("spawn1_yaw"),
                     rs.getFloat("spawn1_pitch")
             );
             Location spawn2 = new Location(
                     Duels.getInstance().getServer().getWorld(rs.getString("spawn2_world")), 
-                    rs.getInt("spawn2_x"),
-                    rs.getInt("spawn2_y"),
-                    rs.getInt("spawn2_z"),
+                    rs.getDouble("spawn2_x"),
+                    rs.getDouble("spawn2_y"),
+                    rs.getDouble("spawn2_z"),
                     rs.getFloat("spawn2_yaw"),
                     rs.getFloat("spawn2_pitch")
             );
@@ -286,21 +288,41 @@ public class Arena {
         } else if (player2 != null && player1 != null) {
             DuelMessage.DUEL_STARTED.sendTo(player1, ActiveDuel.getConfigVal());
             DuelMessage.DUEL_STARTED.sendTo(player2, ActiveDuel.getConfigVal());
+            sendBigText("FIGHT!", 0, 8, 4);
             duel_started = true;
             ActiveDuel.register(this);
             DuelMetaData.remove(player1, DuelMetaData.PREVENT_MOVING);
             DuelMetaData.remove(player2, DuelMetaData.PREVENT_MOVING);
         }
     }
-
+    
     private boolean isAvailable() {
         return is_available;
     }
 
     public void sendCountdown(int i) {
-        String format = duels.getConfig().getString("Title.Countdown");
-        DuelMessage.SEND_COUNTDOWN.sendTo(player1, i + "");
-        DuelMessage.SEND_COUNTDOWN.sendTo(player2, i + "");
+    	if (Duels.getInstance().getServer().getVersion().compareTo("1.8") >= 0) {
+    		sendBigText(i + "");
+    	} else {
+	        DuelMessage.SEND_COUNTDOWN.sendTo(player1, i + "");
+	        DuelMessage.SEND_COUNTDOWN.sendTo(player2, i + "");
+    	}
+    }
+    
+    private void sendBigText(String text) {
+        sendBigText(text, 0,3,2);
+    }
+    
+    private void sendBigText(String text, int fadein, int display, int fadeout) {
+        IChatBaseComponent chatTitle = IChatBaseComponent.ChatSerializer.a("{text:\"" + text + ".\",color:gold,bold:true,underlined:false,italic:false,strikethrough:false,obfuscated:false} ");
+        PacketPlayOutTitle packet = new PacketPlayOutTitle(fadein, display, fadeout);
+        PacketPlayOutTitle packet1 = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, chatTitle);
+        PlayerConnection p1con = ((CraftPlayer) player1).getHandle().playerConnection;
+        PlayerConnection p2con = ((CraftPlayer) player2).getHandle().playerConnection;
+        p1con.sendPacket(packet);
+        p1con.sendPacket(packet1);
+        p2con.sendPacket(packet);
+        p2con.sendPacket(packet1);
     }
 
     public void teleportPlayers() {

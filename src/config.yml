@@ -33,7 +33,7 @@ Messages:
     SendLeaveEarly: '&6You have decided to leave the arena early.'
   Title:
     SendCountdown: '&6Duel will begin in $1 seconds...'
-    DuelStarted: '&6Match has begun! You have $1 seconds to defeat your oponent.'
+    DuelStarted: '&6The fight has begun! You have $1 seconds to defeat your oponent.'
     DuelWon: '&6Congratulations you won the duel! You have $1 seconds to collect the loot...'
     DuelLost: '&6Duel lost...'
     OutOfTime: '&6The duel is a draw! You have run out of time.'

@@ -5,3 +5,5 @@ build.xml
 manifest.mf
 build/
 /dist/
+.project
+.classpath
