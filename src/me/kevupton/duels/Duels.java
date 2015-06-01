@@ -8,7 +8,7 @@ import me.kevupton.duels.events.PlayerCommandEvent;
 import me.kevupton.duels.events.PlayerDieEvent;
 import me.kevupton.duels.events.PlayerLeaveEvent;
 import me.kevupton.duels.exceptions.DuelCommandException;
-import me.kevupton.duels.processmanager.processes.ActiveDuel;
+import me.kevupton.duels.processes.ActiveDuel;
 import me.kevupton.duels.utils.Arena;
 import me.kevupton.duels.utils.Database;
 import me.kevupton.duels.utils.DuelMessage;

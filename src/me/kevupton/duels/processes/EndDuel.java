@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.kevupton.duels.processmanager.processes;
+package me.kevupton.duels.processes;
 
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.utils.Arena;

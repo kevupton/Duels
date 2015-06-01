@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.kevupton.duels.processmanager.processes;
+package me.kevupton.duels.processes;
 
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
@@ -50,11 +50,11 @@ public class StartDuel implements Runnable {
                     start_time = System.currentTimeMillis();
                     entered_arena = true;
                 } else {
-                    if (!p1.getLocation().toVector().equals(loc_check_p1)) {
+                    if (!p1.isOnline() || !p1.getLocation().toVector().equals(loc_check_p1)) {
                         arena.sendCancelMessage(p1);
                         arena.reset();
                         break;
-                    } else if (!p2.getLocation().toVector().equals(loc_check_p2)) {
+                    } else if (!p2.isOnline() || !p2.getLocation().toVector().equals(loc_check_p2)) {
                         arena.sendCancelMessage(p2);
                         arena.reset();
                         break;
