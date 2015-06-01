@@ -124,13 +124,16 @@ public class Title {
         craftPlayer = getOBCClass("entity.CraftPlayer");
 		packetTitle = getClass("org.spigotmc.ProtocolInjector$PacketTitle");
 		packetActions = getClass("org.spigotmc.ProtocolInjector$PacketTitle$Action");
-		nmsChatSerializer = getNMSClass("ChatSerializer");
+        if (getVersion().equals("v1_8_R1."))
+            nmsChatSerializer = getNMSClass("ChatSerializer");
+        else
+            nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
         chatBaseComponent = getNMSClass("IChatBaseComponent");
         packetPlayout = getNMSClass("PacketPlayOutTitle");
-        if (getVersion().equals("v1_8_R1"))
+        if (getVersion().equals("v1_8_R1."))
             enumTitleAction = getNMSClass("EnumTitleAction");
         else
-            enumTitleAction = getNMSClass("PacketPlayOutTitle.EnumTitleAction");
+            enumTitleAction = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
         playerConnection = getNMSClass("PlayerConnection");
 	}
     
@@ -243,13 +246,6 @@ public class Title {
 	public void setTimingsToSeconds() {
 		ticks = false;
 	}
-    
-    public void send_test(Player player) {
-//        if (getVersion().equals("v1_8_R1")) 
-//            send_old(player);
-//        else 
-//            send_new(player);
-    }
     
     public void send(Player plyr) {
         try {
@@ -537,13 +533,14 @@ public class Title {
 	}
 
 	private Method getMethod(Class<?> clazz, String name, Class<?>... args) {
-		for (Method m : clazz.getMethods())
+		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals(name)
 					&& (args.length == 0 || ClassListEqual(args,
 							m.getParameterTypes()))) {
 				m.setAccessible(true);
 				return m;
 			}
+        }
 		return null;
 	}
 
