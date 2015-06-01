@@ -19,6 +19,7 @@ Messages:
     StartedUpdatingArena: '&6Started updating arena $1'
     StartedCreatingArena: '&6Started creating new arena'
   Player:
+    UnableToCommand: '&4Cannot use commands whilst in a duel.'
     SendToSelf: '&4Cannot send a duel request to yourself.' 
     RequestExists: '&4A duel request between you two already exists.'
     NoAvailableArenas: '&6Sorry there are no arenas currently available.'

@@ -6,6 +6,7 @@
 package me.kevupton.duels.events;
 
 import me.kevupton.duels.Duels;
+import me.kevupton.duels.utils.DuelMessage;
 import me.kevupton.duels.utils.DuelMetaData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +23,7 @@ public class PlayerCommandEvent implements Listener {
         Player player = event.getPlayer();
         Duels.logInfo(event.getMessage());
         if (DuelMetaData.COMMAND_BAN.isOn(player)) {
+            DuelMessage.UNABLE_TO_USE_COMMAND.sendTo(player);
             event.setCancelled(true);
         }
     }

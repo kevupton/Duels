@@ -23,8 +23,8 @@ public class PlayerLeaveEvent implements Listener {
     public void onPlayerDisconnect(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         try {
-            if (!DuelMetaData.COMMAND_BAN.isOn(player) && 
-                    !DuelMetaData.IN_ARENA.isOn(player)) {
+            if (DuelMetaData.COMMAND_BAN.isOn(player) || 
+                    DuelMetaData.IN_ARENA.isOn(player)) {
                 Arena a = Arena.getPlayerArena(player);
                 if (DuelMetaData.COMMAND_BAN.isOn(player)) {
                     a.resetPlayer(player);

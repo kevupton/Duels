@@ -4,9 +4,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-
+import me.kevupton.duels.Duels;
+import net.minecraft.server.v1_8_R1.ChatSerializer;
+import net.minecraft.server.v1_8_R1.EnumTitleAction;
+import net.minecraft.server.v1_8_R1.IChatBaseComponent;
+import net.minecraft.server.v1_8_R1.PacketPlayOutTitle;
+import net.minecraft.server.v1_8_R1.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -21,8 +27,8 @@ public class Title {
 	/* Title packet actions ENUM */
 	private Class<?> packetActions;
 	/* Chat serializer */
+    private Class<?> craftPlayer;
 	private Class<?> nmsChatSerializer;
-	private Class<?> chatBaseComponent;
 	/* Title text and color */
 	private String title = "";
 	private ChatColor titleColor = ChatColor.WHITE;
@@ -37,6 +43,11 @@ public class Title {
 
 	private static final Map<Class<?>, Class<?>> CORRESPONDING_TYPES = new HashMap<Class<?>, Class<?>>();
     private boolean is_bold = false;
+    private Class<?> chatBaseComponent;
+    private Class<?> packetPlayout;
+    private Class<?> enumTitleAction;
+    private Class<?> playerConnection;
+    
 
 	/**
 	 * Create a new 1.8 title
@@ -110,13 +121,20 @@ public class Title {
 	 * Load spigot and NMS classes
 	 */
 	private void loadClasses() {
-		packetTitle = getNMSClass("PacketPlayOutTitle");
-		packetActions = getNMSClass("PacketPlayOutTitle$EnumTitleAction");
-		chatBaseComponent = getNMSClass("IChatBaseComponent");
-		nmsChatSerializer = getNMSClass("IChatBaseComponent$ChatSerializer");
+        craftPlayer = getOBCClass("entity.CraftPlayer");
+		packetTitle = getClass("org.spigotmc.ProtocolInjector$PacketTitle");
+		packetActions = getClass("org.spigotmc.ProtocolInjector$PacketTitle$Action");
+		nmsChatSerializer = getNMSClass("ChatSerializer");
+        chatBaseComponent = getNMSClass("IChatBaseComponent");
+        packetPlayout = getNMSClass("PacketPlayOutTitle");
+        if (getVersion().equals("v1_8_R1"))
+            enumTitleAction = getNMSClass("EnumTitleAction");
+        else
+            enumTitleAction = getNMSClass("PacketPlayOutTitle.EnumTitleAction");
+        playerConnection = getNMSClass("PlayerConnection");
 	}
     
-    
+
     public void setBold(boolean on) {
         is_bold = on;
     }
@@ -225,6 +243,39 @@ public class Title {
 	public void setTimingsToSeconds() {
 		ticks = false;
 	}
+    
+    public void send_test(Player player) {
+//        if (getVersion().equals("v1_8_R1")) 
+//            send_old(player);
+//        else 
+//            send_new(player);
+    }
+    
+    public void send(Player plyr) {
+        try {
+            Object player = craftPlayer.cast(plyr);
+            Object serialized = getMethod(nmsChatSerializer, "a",
+                String.class).invoke(
+                null,
+                "{text:\""
+                    + ChatColor.translateAlternateColorCodes('&',
+                        title) + "\",color:"
+                    + titleColor.name().toLowerCase() + ",bold:" + (is_bold? "true": "false") + "}");
+           
+            //"{text:\"" + title + ".\",color:gold,bold:true,underlined:false,italic:false,strikethrough:false,obfuscated:false} "
+            Object[] actions = enumTitleAction.getEnumConstants();
+            Object packet = packetPlayout.getConstructor(int.class, int.class, int.class).newInstance(fadeInTime, stayTime, fadeOutTime);
+            Object packet1 = packetPlayout.getConstructor(enumTitleAction, chatBaseComponent).newInstance(actions[0], serialized);
+            Object handle = getHandle(player);
+            Object connection = getField(handle.getClass(),
+                    "playerConnection").get(handle);
+            Method sendPacket = getMethod(connection.getClass(),"sendPacket");
+            sendPacket.invoke(connection, packet);
+            sendPacket.invoke(connection, packet1);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * Send the title to a player
@@ -232,7 +283,7 @@ public class Title {
 	 * @param player
 	 *            Player
 	 */
-	public void send(Player player) {
+	public void send_new(Player player) {
 		if (packetTitle != null) {
 			// First reset previous settings
 			resetTitle(player);
@@ -277,8 +328,8 @@ public class Title {
 											+ subtitleColor.name()
 													.toLowerCase() + "}");
 					packet = packetTitle.getConstructor(packetActions,
-							chatBaseComponent).newInstance(actions[1],
-							serialized);
+							getNMSClass("IChatBaseComponent")).newInstance(
+							actions[1], serialized);
 					sendPacket.invoke(connection, packet);
 				}
 			} catch (Exception e) {
@@ -303,18 +354,21 @@ public class Title {
 	 *            Player
 	 */
 	public void clearTitle(Player player) {
-		try {
-			// Send timings first
-			Object handle = getHandle(player);
-			Object connection = getField(handle.getClass(), "playerConnection")
-					.get(handle);
-			Object[] actions = packetActions.getEnumConstants();
-			Method sendPacket = getMethod(connection.getClass(), "sendPacket");
-			Object packet = packetTitle.getConstructor(packetActions,
-					chatBaseComponent).newInstance(actions[3], null);
-			sendPacket.invoke(connection, packet);
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (getProtocolVersion(player) >= 47 && isSpigot()) {
+			try {
+				// Send timings first
+				Object handle = getHandle(player);
+				Object connection = getField(handle.getClass(),
+						"playerConnection").get(handle);
+				Object[] actions = packetActions.getEnumConstants();
+				Method sendPacket = getMethod(connection.getClass(),
+						"sendPacket");
+				Object packet = packetTitle.getConstructor(packetActions)
+						.newInstance(actions[3]);
+				sendPacket.invoke(connection, packet);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -324,20 +378,82 @@ public class Title {
 	 * @param player
 	 *            Player
 	 */
-	public void resetTitle(Player player) {
+	public void resetTitle(Object player) {
+		if (getProtocolVersion((Player) player) >= 47 && isSpigot()) {
+			try {
+				// Send timings first
+				Object handle = getHandle(player);
+				Object connection = getField(handle.getClass(),
+						"playerConnection").get(handle);
+				Object[] actions = packetActions.getEnumConstants();
+				Method sendPacket = getMethod(connection.getClass(),
+						"sendPacket");
+				Object packet = packetTitle.getConstructor(packetActions)
+						.newInstance(actions[4]);
+				sendPacket.invoke(connection, packet);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Get the protocol version of the player
+	 * 
+	 * @param player
+	 *            Player
+	 * @return Protocol version
+	 */
+	private int getProtocolVersion(Object player) {
+		int version = 0;
 		try {
-			// Send timings first
 			Object handle = getHandle(player);
 			Object connection = getField(handle.getClass(), "playerConnection")
 					.get(handle);
-			Object[] actions = packetActions.getEnumConstants();
-			Method sendPacket = getMethod(connection.getClass(), "sendPacket");
-			Object packet = packetTitle.getConstructor(packetActions,
-					chatBaseComponent).newInstance(actions[4], null);
-			sendPacket.invoke(connection, packet);
-		} catch (Exception e) {
-			e.printStackTrace();
+			Object networkManager = getValue("networkManager", connection);
+			version = (Integer) getMethod("getVersion",
+					networkManager.getClass()).invoke(networkManager);
+
+			return version;
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
+		return version;
+	}
+    
+	/**
+	 * Check if running spigot
+	 * 
+	 * @return Spigot
+	 */
+	private boolean isSpigot() {
+		return Bukkit.getVersion().contains("Spigot");
+	}
+
+	/**
+	 * Get class by url
+	 * 
+	 * @param namespace
+	 *            Namespace url
+	 * @return Class
+	 */
+	private Class<?> getClass(String namespace) {
+		try {
+			return Class.forName(namespace);
+		} catch (Exception e) {
+            
+		}
+		return null;
+	}
+
+	private Field getField(String name, Class<?> clazz) throws Exception {
+		return clazz.getDeclaredField(name);
+	}
+
+	private Object getValue(String name, Object obj) throws Exception {
+		Field f = getField(name, obj.getClass());
+		f.setAccessible(true);
+		return f.get(obj);
 	}
 
 	private Class<?> getPrimitiveType(Class<?> clazz) {
@@ -387,9 +503,17 @@ public class Title {
 		String version = name.substring(name.lastIndexOf('.') + 1) + ".";
 		return version;
 	}
-
-	private Class<?> getNMSClass(String className) {
-		String fullName = "net.minecraft.server." + getVersion() + className;
+    
+    private Class<?> getNMSClass(String className) {
+        return getVersionClass("net.minecraft.server", className);
+    }
+    
+	private Class<?> getOBCClass(String className) {
+        return getVersionClass("org.bukkit.craftbukkit", className);
+    }
+    
+    private Class<?> getVersionClass(String loc, String className) {
+		String fullName = loc + "." + getVersion() + className;
 		Class<?> clazz = null;
 		try {
 			clazz = Class.forName(fullName);
@@ -398,6 +522,8 @@ public class Title {
 		}
 		return clazz;
 	}
+    
+    
 
 	private Field getField(Class<?> clazz, String name) {
 		try {
