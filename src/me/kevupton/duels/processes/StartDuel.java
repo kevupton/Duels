@@ -8,6 +8,7 @@ package me.kevupton.duels.processes;
 import me.kevupton.duels.Duels;
 import me.kevupton.duels.exceptions.ArenaException;
 import me.kevupton.duels.utils.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -46,7 +47,10 @@ public class StartDuel implements Runnable {
             
             if (!entered_arena) {
                 if (time >= getConfigVal()) {
-                    arena.teleportPlayers();
+                    Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(
+                            Duels.getInstance(), 
+                            new TeleportPlayers(arena)
+                    );
                     start_time = System.currentTimeMillis();
                     entered_arena = true;
                 } else {
